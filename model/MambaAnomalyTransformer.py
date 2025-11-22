@@ -84,13 +84,29 @@ class Encoder(nn.Module):
 class MambaAnomalyTransformer(nn.Module):
     def __init__(self, win_size, enc_in, c_out, d_model=512, n_heads=8, block_size=10, e_layers=3, d_ff=512,
                  dropout=0.0, activation='gelu', output_attention=True):
+        """
+        初始化MambaAnomalyTransformer模型
+        
+        参数:
+            win_size (int): 输入序列的窗口大小，即时间序列的长度
+            enc_in (int): 输入特征的维度数量，即每个时间步的特征数
+            c_out (int): 输出特征的维度数量，通常与enc_in相同
+            d_model (int, optional): 模型的隐藏层维度，默认为512
+            n_heads (int, optional): 多头注意力机制中的头数，默认为8
+            block_size (int, optional): 注意力机制中的块大小，默认为10
+            e_layers (int, optional): 编码器层数，默认为3
+            d_ff (int, optional): 前馈网络的隐藏层维度，默认为512
+            dropout (float, optional): Dropout概率，默认为0.0（不使用dropout）
+            activation (str, optional): 激活函数类型，可选'relu'或'gelu'，默认为'gelu'
+            output_attention (bool, optional): 是否输出注意力权重，默认为True
+        """
         super(MambaAnomalyTransformer, self).__init__()
         self.output_attention = output_attention
 
-        # Encoding
+        # Encoding - 数据嵌入层，将输入数据映射到高维空间
         self.embedding = DataEmbedding(enc_in, d_model, dropout)
 
-        # Encoder
+        # Encoder - 构建编码器，包含多个编码层
         self.encoder = Encoder(
             [
                 EncoderLayer(
@@ -108,6 +124,7 @@ class MambaAnomalyTransformer(nn.Module):
             d_model=d_model
         )
 
+        # Projection - 输出投影层，将模型输出映射到目标维度
         self.projection = nn.Linear(d_model, c_out, bias=True)
 
     def forward(self, x):
