@@ -124,6 +124,7 @@ class MambaAnomalyTransformer(nn.Module):
             d_model=d_model
         )
 
+
         # Projection - 输出投影层，将模型输出映射到目标维度
         self.projection = nn.Linear(d_model, c_out, bias=True)
 
